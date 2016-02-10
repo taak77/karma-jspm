@@ -12,6 +12,7 @@ describe('jspm plugin init', function(){
 
     beforeEach(function(){
         files = [];
+        exclude = ['src/**/adapter.js'];
         jspm = {
             config: 'custom_config.js',
             loadFiles: ['src/**/*.js',{pattern:'not-cached.js', nocache:true}],
@@ -20,7 +21,7 @@ describe('jspm plugin init', function(){
         };
         client = {};
 
-        initJspm(files, basePath, jspm, client);
+        initJspm(files, exclude, basePath, jspm, client);
     });
 
     it('should add config.js to the top of the files array', function(){
@@ -45,6 +46,10 @@ describe('jspm plugin init', function(){
 
     it('should add files from jspm.loadFiles to client.expandedFiles', function(){
         expect(client.jspm.expandedFiles).toEqual(['src/adapter.js', 'src/init.js']);
+    });
+
+    it('should exclude files from config.exclude to client.jspm.excludedFiles', function(){
+        expect(client.jspm.excludedFiles).toEqual(['src/adapter.js']);
     });
 
     it('should add files from jspm.serveFiles to the end of the files array as served files', function(){

@@ -49,12 +49,17 @@
 
         // Load everything specified in loadFiles in the specified order
         var promiseChain = Promise.resolve();
+        var expandedFile;
         for (var i = 0; i < karma.config.jspm.expandedFiles.length; i++) {
+            expandedFile = karma.config.jspm.expandedFiles[i];
+            if (karma.config.jspm.excludedFiles.indexOf(expandedFile) > -1) {
+                continue;
+            }
             promiseChain = promiseChain.then((function (moduleName) {
                 return function () {
                     return System['import'](moduleName);
                 };
-            })(extractModuleName(karma.config.jspm.expandedFiles[i])));
+            })(extractModuleName(expandedFile)));
         }
 
         promiseChain.then(function () {

@@ -58,7 +58,7 @@ function getJspmPackageJson(dir) {
   return pjson;
 }
 
-module.exports = function(files, basePath, jspm, client) {
+module.exports = function(files, exclude, basePath, jspm, client) {
   // Initialize jspm config if it wasn't specified in karma.conf.js
   if(!jspm)
     jspm = {};
@@ -76,6 +76,8 @@ module.exports = function(files, basePath, jspm, client) {
     client.jspm.paths = jspm.paths;
   if(jspm.meta !== undefined && typeof jspm.meta === 'object')
     client.jspm.meta = jspm.meta;
+  if(!exclude)
+    exclude = [];
 
   // Pass on options to client
   client.jspm.useBundles = jspm.useBundles;
@@ -103,6 +105,10 @@ module.exports = function(files, basePath, jspm, client) {
   files.unshift(createPattern(__dirname + '/adapter.js'));
   files.unshift(createPattern(getLoaderPath('system-polyfills.src')));
   files.unshift(createPattern(getLoaderPath('system.src')));
+
+  client.jspm.excludedFiles = flatten(exclude.map(function(pattern){
+    return expandGlob(path.relative(basePath, pattern), basePath);
+  }));
 
   // Loop through all of jspm.load_files and do two things
   // 1. Add all the files as "served" files to the files array
